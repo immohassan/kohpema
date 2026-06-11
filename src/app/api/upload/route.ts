@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
+import { put } from "@vercel/blob";
 import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
@@ -41,11 +42,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Max file size is 8 MB" }, { status: 400 });
   }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
   const name = `${crypto.randomBytes(8).toString("hex")}${EXT[file.type]}`;
+
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const blob = await put(`uploads/${name}`, file, {
+      access: "public",
+      contentType: file.type,
+    });
+    return NextResponse.json({ url: blob.url });
+  }
+
+  // Local dev without a Blob token: keep writing to public/uploads
+  const buffer = Buffer.from(await file.arrayBuffer());
   const dir = path.join(process.cwd(), "public", "uploads");
   await fs.mkdir(dir, { recursive: true });
   await fs.writeFile(path.join(dir, name), buffer);
-
   return NextResponse.json({ url: `/uploads/${name}` });
 }
