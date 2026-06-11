@@ -64,6 +64,7 @@ export default async function EditProductPage({
           featured: product.featured,
           categoryId: product.categoryId,
           specs: (product.specs as string[]) ?? [],
+          videoUrl: product.videoUrl,
           images: product.images.map((i) => ({ url: i.url, alt: i.alt })),
           options: product.options.map((o) => ({ name: o.name, values: o.values })),
           variants: product.variants.map((v) => ({

@@ -18,6 +18,7 @@ export type ProductPayload = {
   featured: boolean;
   categoryId: string | null;
   specs: string[];
+  videoUrl: string | null;
   images: { url: string; alt?: string | null }[];
   options: { name: string; values: string[] }[];
   variants: {
@@ -71,6 +72,7 @@ export async function createProduct(payload: ProductPayload) {
       featured: payload.featured,
       categoryId: payload.categoryId,
       specs: payload.specs,
+      videoUrl: payload.videoUrl,
       images: {
         create: payload.images.map((img, i) => ({
           url: img.url,
@@ -126,6 +128,7 @@ export async function updateProduct(id: string, payload: ProductPayload) {
         featured: payload.featured,
         categoryId: payload.categoryId,
         specs: payload.specs,
+        videoUrl: payload.videoUrl,
         images: {
           create: payload.images.map((img, i) => ({
             url: img.url,

@@ -33,6 +33,7 @@ type Props = {
     featured: boolean;
     categoryId: string | null;
     specs: string[];
+    videoUrl: string | null;
     images: { url: string; alt: string | null }[];
     options: { name: string; values: string[] }[];
     variants: {
@@ -64,6 +65,7 @@ export default function ProductForm({ categories, product }: Props) {
   const [featured, setFeatured] = useState(product?.featured ?? false);
   const [categoryId, setCategoryId] = useState(product?.categoryId ?? "");
   const [specs, setSpecs] = useState<string[]>(product?.specs ?? []);
+  const [videoUrl, setVideoUrl] = useState(product?.videoUrl ?? "");
   const [specInput, setSpecInput] = useState("");
   const [images, setImages] = useState<{ url: string; alt: string | null }[]>(
     product?.images ?? []
@@ -150,6 +152,7 @@ export default function ProductForm({ categories, product }: Props) {
       featured,
       categoryId: categoryId || null,
       specs,
+      videoUrl: videoUrl.trim() || null,
       images,
       options: parsedOptions(),
       variants: variants.map((v) => ({
@@ -263,6 +266,24 @@ export default function ProductForm({ categories, product }: Props) {
               onChange={(e) => handleUpload(e.target.files)}
             />
           </label>
+        </section>
+
+        {/* Video */}
+        <section className="bg-white border border-neutral-200 p-6">
+          <h3 className="font-heading font-semibold uppercase tracking-widest text-sm mb-1">
+            Video
+          </h3>
+          <p className="text-xs text-neutral-500 mb-4">
+            YouTube/Vimeo link or direct video file URL, shown on the product
+            page.
+          </p>
+          <input
+            className="input"
+            type="url"
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
+            placeholder="e.g. https://www.youtube.com/watch?v=..."
+          />
         </section>
 
         {/* Specs */}

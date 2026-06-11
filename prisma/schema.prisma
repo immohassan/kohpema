@@ -48,6 +48,8 @@ model Product {
   featured     Boolean        @default(false)
   // Princeton-Tec-style spec badges shown on product cards
   specs        Json           @default("[]")
+  // YouTube/Vimeo or direct video file URL shown on the product page
+  videoUrl     String?
   categoryId   String?
   category     Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   images       ProductImage[]

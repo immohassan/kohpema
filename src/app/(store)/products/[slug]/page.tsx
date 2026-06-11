@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ProductPurchase from "@/components/store/ProductPurchase";
 import ProductGallery from "@/components/store/ProductGallery";
+import ProductVideo from "@/components/store/ProductVideo";
 import ProductCard from "@/components/store/ProductCard";
 
 export const dynamic = "force-dynamic";
@@ -130,6 +131,10 @@ export default async function ProductPage({
           )}
         </div>
       </div>
+
+      {product.videoUrl && (
+        <ProductVideo url={product.videoUrl} name={product.name} />
+      )}
 
       {related.length > 0 && (
         <section className="mt-20">
