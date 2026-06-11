@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { put } from "@vercel/blob";
-import fs from "fs/promises";
-import path from "path";
-import crypto from "crypto";
+import { prisma } from "@/lib/prisma";
 
 const ALLOWED = new Set([
   "image/jpeg",
@@ -12,14 +9,6 @@ const ALLOWED = new Set([
   "image/gif",
   "image/svg+xml",
 ]);
-
-const EXT: Record<string, string> = {
-  "image/jpeg": ".jpg",
-  "image/png": ".png",
-  "image/webp": ".webp",
-  "image/gif": ".gif",
-  "image/svg+xml": ".svg",
-};
 
 export async function POST(req: Request) {
   const session = await getSession();
@@ -38,24 +27,15 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-  if (file.size > 8 * 1024 * 1024) {
-    return NextResponse.json({ error: "Max file size is 8 MB" }, { status: 400 });
+  if (file.size > 4 * 1024 * 1024) {
+    return NextResponse.json({ error: "Max file size is 4 MB" }, { status: 400 });
   }
 
-  const name = `${crypto.randomBytes(8).toString("hex")}${EXT[file.type]}`;
+  const data = Buffer.from(await file.arrayBuffer());
+  const image = await prisma.image.create({
+    data: { data, contentType: file.type },
+    select: { id: true },
+  });
 
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
-    const blob = await put(`uploads/${name}`, file, {
-      access: "public",
-      contentType: file.type,
-    });
-    return NextResponse.json({ url: blob.url });
-  }
-
-  // Local dev without a Blob token: keep writing to public/uploads
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const dir = path.join(process.cwd(), "public", "uploads");
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(path.join(dir, name), buffer);
-  return NextResponse.json({ url: `/uploads/${name}` });
+  return NextResponse.json({ url: `/api/images/${image.id}` });
 }
